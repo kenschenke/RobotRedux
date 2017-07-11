@@ -51,6 +51,8 @@ void InstallReducer(Store &store, bool &StoreItem, BoolReducer reducer);
 ### Bool.cpp
 
 ```C++
+#include "Bool.h"
+
 class ReducerMarshallBool : public ReducerMarshallBase
 {
 public:
@@ -69,5 +71,57 @@ void InstallReducer(Store &store, bool &StoreItem, BoolReducer reducer)
 {
    ReducerMarshallBool *marshall = new ReducerMarshallBool(StoreItem, reducer);
    store.InstallReducer(marshall);
+}
+```
+
+### Example.cpp
+
+```C++
+#include "Bool.h"
+#include <Redux/Redux.h>
+
+bool HasGearReducer(bool OldState, const BoolAction &action)
+{
+   switch (action.type())
+   {
+   case 1:
+      return true;
+
+   case 2:
+      return false;
+
+   default:
+      return false;
+   }
+}
+
+class State : public StateBase
+{
+public:
+   std::string toString(void) const;
+
+public:
+   bool HasGear;
+};
+
+std::string State::toString(void) const
+{
+   std::string str("HasGear: ");
+   str += HasGear ? "true" : "false";
+   return str;
+}
+
+int main()
+{
+   State state;
+   Store store(state);
+
+   InstallReducer(store, state.HasGear, HasGearReducer);
+   store.Dispatch(BoolAction(1));
+   printf("%s\n", state.toString().c_str());
+   store.Dispatch(BoolAction(2));
+   printf("%s\n", state.toString().c_str());
+
+   return 0;
 }
 ```
